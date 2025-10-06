@@ -1,0 +1,83 @@
+---
+title: "Análisis inicial de bases"
+output: html_document
+date: "2025-10-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(janitor)
+library(tidyverse)
+library(skimr)
+library(readr)
+library (readxl)
+library(dplyr)
+```
+
+```{r Convencionales 2021}
+GCC_Clean <- Gasto_Candidatos_Constitucionales_2021 %>% clean_names()
+
+colnames(GCC_Clean)
+Gasto_Constituyente <- GCC_Clean %>% select(x2, x3, x9, x19, x20)
+
+gcc <- Gasto_Constituyente %>% rename(autoridad_electa = x2,
+                      region = x3,
+                      partido_politico = x9,
+                      glosa_del_gasto = x19,
+                      monto_en_pesos = x20)
+
+gcc_limited <- gcc %>% filter(autoridad_electa == "CONVENCIONAL CONSTITUYENTE")
+
+gcc_l_filtado <- gcc_limited %>% filter(str_detect(glosa_del_gasto, regex("digital", ignore_case = T)))
+
+```
+
+```{r Parlamentarias 2021}
+colnames(Gasto_Campañas_Parlamentarias_2021)
+
+GCP <- Gasto_Campañas_Parlamentarias_2021 %>% select(...2,...3,...9,...19,...21)
+
+GCP <- GCP %>% rename(autoridad_electa = ...2,
+                      region = ...3,
+                      partido_politico = ...9,
+                      glosa_del_gasto = ...19,
+                      monto = ...21)
+
+GCP_flitrado <- GCP %>% filter(str_detect(glosa_del_gasto, regex("digital", ignore_case = T)),
+                               autoridad_electa %in% c("SENADOR", "DIPUTADO"))
+
+```
+
+```{r Parlamentarias 2017}
+colnames(Gasto_Campaña_Parlamentarias_2017)
+
+GCP17 <- Gasto_Campaña_Parlamentarias_2017 %>% select("PLANILLA DE GASTOS ELECCIONES PRESIDENCIAL Y PARLAMENTARIAS", ...2, ...8,...18, ...19)
+
+GCP17 <- GCP17 %>% rename(autoridad_electa = "PLANILLA DE GASTOS ELECCIONES PRESIDENCIAL Y PARLAMENTARIAS",
+                          region = ...2,
+                          partido_politico = ...8,
+                          glosa_del_gasto = ...18,
+                          monto = ...19)
+
+GCP17_filtrado <- GCP17 %>% filter(str_detect(glosa_del_gasto, regex("digital",ignore_case=T)),
+                                   autoridad_electa %in% c("SENADOR", "DIPUTADO"))
+
+```
+
+```{r 1a Presidenciales 2017}
+colnames(Gasto_primera_vuelta_presidencial_2017)
+GPVP17 <- Gasto_primera_vuelta_presidencial_2017 %>% select(...4, ...2, ...3, ...14, ...15)
+
+GPVP17 <- GPVP17 %>% rename(autoridad_electa = ...4,
+                            region = ...2,
+                            partido_politico = ...3,
+                            glosa_del_gasto = ...14,
+                            monto = ...15)
+GPVP17 <- GPVP17 %>% select(-region)
+
+GPVP17_filtrado <- GPVP17 %>% filter(str_detect(glosa_del_gasto, regex("digital",ignore_case=T)))
+```
+

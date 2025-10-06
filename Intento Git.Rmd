@@ -1,0 +1,25 @@
+---
+title: "Intento Git 2"
+output: html_document
+date: "2025-10-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(usethis)
+
+usethis::use_git_config(user.name = "Claudio-JP", user.email = "claudio.jorquera@uc.cl")
+
+usethis::create_github_token()
+
+gitcreds::gitcreds_set()
+
+usethis::git_vaccinate()
+
+usethis::git_sitrep()
+
+```
+
