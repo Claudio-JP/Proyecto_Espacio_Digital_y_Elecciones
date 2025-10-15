@@ -81,3 +81,68 @@ GPVP17 <- GPVP17 %>% select(-region)
 GPVP17_filtrado <- GPVP17 %>% filter(str_detect(glosa_del_gasto, regex("digital",ignore_case=T)))
 ```
 
+```{r resultados gcc 2021}
+resultados_gcc <- read_excel("2021_05_CCG_Datos_Eleccion.xlsx")
+res_gcc <- resultados_gcc %>% select(...2, ...7, ...8, ...13)
+
+res_gcc <- res_gcc %>% rename(region = ...2,
+                              pacto_electoral = ...7,
+                              partido_político = ...8,
+                              cantidad_votos = ...13)
+
+res_gcc <- res_gcc[-(1:4), ]
+
+res_gcc_region <- res_gcc %>% group_by(region, partido_político) %>%
+  summarize(votos_totales = sum(as.numeric(cantidad_votos),na.rm =T)) %>%
+  ungroup()
+
+res_gcc_total <- res_gcc %>% group_by(partido_político) %>%
+  summarize(votos_totales = sum(as.numeric(cantidad_votos),na.rm =T)) %>%
+  ungroup()
+rm(res_gcc)
+```
+
+```{r resultados parlamentarias 2021}
+diputados_2021 <- read_excel("2021_11_Diputados_Datos_Eleccion.xlsx")
+
+dip_2021 <- diputados_2021 %>% select(...2, ...7, ...8, ...13)
+
+dip_2021 <- dip_2021 %>% rename(region = ...2,
+                              pacto_electoral = ...7,
+                              partido_político = ...8,
+                              cantidad_votos = ...13) 
+
+dip_2021 <- dip_2021[-(1:4), ]
+
+dip_2021_region <- dip_2021 %>% group_by(region, partido_político) %>%
+  summarize(votos_totales = sum(as.numeric(cantidad_votos), na.rm=T)) %>%
+  ungroup()
+
+dip_2021_partido <- dip_2021 %>% group_by(partido_político) %>%
+  summarize(votos_totales = sum(as.numeric(cantidad_votos), na.rm=T)) %>%
+  ungroup()
+
+senadores_2021 <- read_excel("2021_11_Senadores_Datos_Eleccion.xlsx")
+
+sen_2021 <- senadores_2021 %>% select(...2, ...7, ...8, ...13)
+
+sen_2021 <- sen_2021 %>% rename(region = ...2,
+                              pacto_electoral = ...7,
+                              partido_político = ...8,
+                              cantidad_votos = ...13) 
+
+sen_2021 <- sen_2021[-(1:4), ]
+
+sen_2021_region <- sen_2021 %>% group_by(region, partido_político) %>%
+  summarize(votos_totales = sum(as.numeric(cantidad_votos), na.rm=T)) %>%
+  ungroup()
+
+sen2021_partido <- dip_2021 %>% group_by(partido_político) %>%
+  summarize(votos_totales = sum(as.numeric(cantidad_votos), na.rm=T)) %>%
+  ungroup()
+```
+
+```{r}
+
+```
+
