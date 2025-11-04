@@ -12,9 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(janitor)
 library(tidyverse)
 library(skimr)
-library(readr)
 library (readxl)
-library(dplyr)
 ```
 
 ```{r Convencionales 2021}
