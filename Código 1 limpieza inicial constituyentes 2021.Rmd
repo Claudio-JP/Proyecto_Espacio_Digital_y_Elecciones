@@ -137,12 +137,29 @@ sen_2021_region <- sen_2021 %>% group_by(region, partido_político) %>%
   summarize(votos_totales = sum(as.numeric(cantidad_votos), na.rm=T)) %>%
   ungroup()
 
-sen2021_partido <- dip_2021 %>% group_by(partido_político) %>%
+sen_2021_partido <- sen_2021 %>% group_by(partido_político) %>%
+  summarize(votos_totales = sum(as.numeric(cantidad_votos), na.rm=T)) %>%
+  ungroup()
+
+#hay que unir las bases de datos de sen y dip, pero solo cuando escogamos los partidos con los que vamos a trabajar, así se hace mucho más fácil
+```
+
+```{r resultados presidenciales 2017}
+primera_presi_2017 <- read_excel("2017_11_Presidencial_Datos_Eleccion.xlsx")
+pp_2017 <- primera_presi_2017 %>% select(...2, ...11, ...13)
+
+pp_2017 <- pp_2017 %>% rename(region = ...2,
+                              primer_apellido = ...11,
+                              cantidad_votos = ...13)
+
+pp_2017 <- pp_2017[-(1:4), ]
+
+pp_2017_1 <- pp_2017 %>% group_by(primer_apellido) %>% 
   summarize(votos_totales = sum(as.numeric(cantidad_votos), na.rm=T)) %>%
   ungroup()
 ```
 
-```{r}
+```{r parlamentarias 2017}
 
 ```
 
