@@ -50,7 +50,10 @@ Por unidad principal de análisis se tendrán a algunos Partidos Políticos sele
 
 ### Parte II
 
-Outputs iniciales: 
+#### Plan de Análisis: 
+Con los outputs iniciales de Gastos y Resultados electorales, el objetivo ahora es comenzar con la identificación inicial de las relaciones entre las variables dependiente e independiente. Esto, mediante la aplicación de herramientas estadísticas varias como el cálculo de correlación, regresiones logística multinomial, regresión lineal múltiple, análisis de efectos marginales, entre otras consideraciones según el avance de los estudios. Además, se controlará por concepto de variable interviniente a: Región, Tipo de Elección, Evolución Temporal. Según el avance del análisis, se podrán considerar otras variables intervinientes.
+
+#### Outputs iniciales: 
 
 <img width="875" height="540" alt="image" src="https://github.com/user-attachments/assets/ba43508c-f8b2-471c-839c-7348f24dfeef" />
 
@@ -60,6 +63,4 @@ Gasto en espacio digital por partido elecciones parlamentarias 2021
 
 Resultado electoral por partido elecciones parlamentarias 2021
 
-#### Plan de Análisis: 
-Con los outputs iniciales de Gastos y Resultados electorales, el objetivo ahora es comenzar con la identificación inicial de las relaciones entre las variables dependiente e independiente. Esto, mediante la aplicación de herramientas estadísticas varias como el cálculo de correlación, regresiones logística multinomial, regresión lineal múltiple, análisis de efectos marginales, entre otras consideraciones según el avance de los estudios. Además, se controlará por concepto de variable interviniente a: Región, Tipo de Elección, Evolución Temporal. Según el avance del análisis, se podrán considerar otras variables intervinientes.
 
