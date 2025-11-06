@@ -19,6 +19,7 @@ library(lubridate)
 library(readxl)
 library(ggplot2)
 library(dplyr)
+library(extrafont)
 ```
 
 #### Se carga el dataset (comenzaremos con las Elecciones Diputados 2021):
@@ -199,3 +200,93 @@ df_votos_por_partido_presidenciales_primera_2017
 -   Dentro de "mutate()" (la nueva columna que creamos) usamos "case_when()" para asignar el nombre del partido político o coalición correspondiente a cada candidato según su primer apellido.
 
 -   Al finalizar nuestros asignamientos dentro de "case_when()", usamos " TRUE \~ "" " para asignar un valor vacío a cualquier otro caso que no coincida con los apellidos especificados.
+
+
+
+## Sección 5: Graficar
+
+#### Crearemos un gráfico de barras para visualizar los votos por partido. Comenzaremos con las Elecciones Presidenciales (1ra Vuelta) 2017:
+
+```{r}
+grafico_presidenciales_primera_2017 <- df_votos_por_partido_presidenciales_primera_2017 |>
+  drop_na() |>
+  ggplot(aes(x = reorder(partido_o_coalicion, -votos), y = votos)) +
+  geom_bar(stat="identity", fill = "steelblue") +
+  labs(title="Votos por Partido o Coalición - Elecciones Presidenciales 2017 (1ra Vuelta)",
+       x="Partido o Coalición",
+       y="Cantidad de Votos") +
+  theme_minimal() +
+  theme(text = element_text(family = "Times New Roman")) +
+  coord_flip()
+grafico_presidenciales_primera_2017
+```
+
+**Explicación:**
+
+-   Usamos el código "drop_na()" para eliminar los NA del dataframe. En este caso, los NA eran de votos blancos o nulos, los cuales no corresponderían a ningún partido, por lo tanto los eliminamos para nuestro caso de estudio.
+
+-   Usamos "ggplot(aes(x = reorder(partido_o_coalicion, -votos), y = votos))" para definir que el partido o coalición sea el Eje X, mientras que la cantidad de votos sería el eje Y.
+
+    -   Usamos "reorder(partido_o_coalicion, -votos) para reordenar el Eje X (parritos o coalición), según la cantidad de votos, al usar el "-" le pedimos que sea en orden descendiente.
+
+-   Usamos "geom_bar(stat="identity", fill = "steelblue")" para crear un gráfico de barras. Asimismo, usamos "steelblue" como el color escogido para de las barras.
+
+-   Usamos "labs()" para agregar los textos. En este caso, para crear un título y etiquetas a los Ejes X e Y.
+
+-   Usamos "theme_minimal()" para otorgarle un tema minimalista al gráfico.
+
+-   Usamos "theme(text = element_text(family = "Times New Roman"))" para cambiar la fuente de los textos a "Times New Roman".
+
+-   Usamos "coord_flip()" para voltear el gráfico, de modo que las barras sean horizontales en lugar de verticales. Esto lo hicimos con el objetivo de que el texto de los partidos o coaliciones sea más legible y no se sobrelapen uno a los otros.
+
+
+
+#### Creamos un gráfico de barras para Elecciones Parlamentarias 2017:
+
+Reutilizaremos el mismo código que las Elecciones Presidenciales 2017, modificando los nombres según sea correspondiente. Sin embargo, al haber muchos partidos políticos, el gráfico puede verse saturado, por lo tanto, visualizaremos solo los 10 partidos con mayor cantidad de votos.
+
+
+```{r}
+grafico_parlamentarias_2017 <- df_votos_por_partido_parlamentarias_2017 |>
+  drop_na() |>
+  top_n(10) |>
+  ggplot(aes(x = reorder(partido, -votos), y = votos)) + 
+  scale_y_continuous(labels = scales::comma) +
+  geom_bar(stat="identity", fill = "steelblue") +
+  labs(title="Votos por Partido - Elecciones Parlamentarias 2017",
+       x="Partido",
+       y="Cantidad de Votos") +
+  theme_minimal() +
+  theme(text = element_text(family = "Times New Roman")) +
+  coord_flip()
+grafico_parlamentarias_2017
+```
+
+**Explicación:**
+
+- Usamos  "top_n(10)" para seleccionar solo los 10 partidos con mayor cantidad de votos, facilitando la visualización del gráfico.
+
+- Usamos "scale_y_continuous(labels = scales::comma)" para que no se muestren la cantidad de votos como anotación científica, sino como números enteros.
+
+
+
+
+#### Creamos un gráfico de barras para Elecciones Parlamentarias 2017:
+
+```{r}
+grafico_parlamentarias_2021 <- df_votos_por_partido_parlamentarias_2021 |>
+  drop_na() |>
+  top_n(10) |>
+  ggplot(aes(x = reorder(partido, -votos), y = votos)) + 
+  scale_y_continuous(labels = scales::comma) +
+  geom_bar(stat="identity", fill = "steelblue") +
+  labs(title="Votos por Partido - Elecciones Parlamentarias 2021",
+       x="Partido",
+       y="Cantidad de Votos") +
+  theme_minimal() +
+  theme(text = element_text(family = "Times New Roman")) +
+  coord_flip()
+grafico_parlamentarias_2021
+```
+
+
