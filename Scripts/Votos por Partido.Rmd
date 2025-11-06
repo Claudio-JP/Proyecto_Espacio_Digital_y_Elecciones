@@ -20,6 +20,7 @@ library(readxl)
 library(ggplot2)
 library(dplyr)
 library(extrafont)
+library(writexl)
 ```
 
 #### Se carga el dataset (comenzaremos con las Elecciones Diputados 2021):
@@ -290,3 +291,52 @@ grafico_parlamentarias_2021
 ```
 
 
+## Sección 6: Sacar Outputs
+
+#### Guardamos los dataframes como archivos .xlsx
+
+**Elecciones Presidenciales 2017 (1ra Vuelta):**
+
+```{r}
+write_xlsx(df_votos_por_partido_presidenciales_primera_2017, "[Output] Votos por Partido/votos_por_partido_presidenciales_primera_2017.xlsx")
+```
+
+
+**Elecciones Diputados 2017:**
+
+```{r}
+write_xlsx(df_votos_por_partido_diputados_2017, "[Output] Votos por Partido/votos_por_partido_diputados_2017.xlsx")
+```
+
+
+**Elecciones Senadores 2017:**
+
+```{r}
+write_xlsx(df_votos_por_partido_senadores_2017, "[Output] Votos por Partido/votos_por_partido_senadores_2017.xlsx")
+```
+
+
+**Elecciones Parlamentarias 2017:**
+```{r}
+write_xlsx(df_votos_por_partido_parlamentarias_2017, "[Output] Votos por Partido/votos_por_partido_parlamentarias_2017.xlsx")
+```
+
+
+**Elecciones Diputados 2021:**
+
+```{r}
+write_xlsx(df_votos_por_partido_diputados_2021, "[Output] Votos por Partido/votos_por_partido_diputados_2021.xlsx")
+```
+
+
+**Elecciones Senadores 2021:**
+
+```{r}
+write_xlsx(df_votos_por_partido_senadores_2021, "[Output] Votos por Partido/votos_por_partido_diputados_2021.xlsx")
+```
+
+
+**Elecciones Parlamentarias 2021:**
+```{r}
+write_xlsx(df_votos_por_partido_parlamentarias_2021, "[Output] Votos por Partido/votos_por_partido_parlamentarias_2021.xlsx")
+```
