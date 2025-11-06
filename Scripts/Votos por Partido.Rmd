@@ -166,6 +166,30 @@ write_xlsx(df_votos_por_partido_parlamentarias_2017, path = "C:/Users/Biblioteca
 df_votos_por_partido_parlamentarias_2017
 ```
 
+
+#### Elecciones Constituyentes 2021
+
+**Se carga el dataset:**
+
+```{r}
+df_constituyentes_2021 <- read_xlsx("C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Input] Base de Datos Elecciones/2021_05_CCG_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
+  janitor::clean_names()
+```
+
+**Sacamos la cantidad de votos por partido:**
+
+```{r}
+df_votos_por_partido_constituyentes_2021 <- df_constituyentes_2021 |>
+  group_by(partido) |>
+  summarise(votos = sum(votos, na.rm=TRUE)) |>
+  arrange(desc(votos))
+write_xlsx(df_votos_por_partido_constituyentes_2021, path = "C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Output] Votos por Partido/votos_por_partido_constituyentes_2021.xlsx")
+df_votos_por_partido_constituyentes_2021
+```
+
+
+
+
 ## Sección 4: Elecciones Presidenciales 2017 (1ra Vuelta)
 
 El dataset de las Elecciones Presidenciales 2017 (1ra Vuelta) tiene la misma estructura que los datasets anteriores. Sin embargo, hay columnas que varían, entre ellas, la columna "partido" no existe. Por lo que, al ser una pequeña cantidad de variables, modificaremos el dataset reemplazando los nombres de los candidatos por sus respectivos partidos políticos.
@@ -213,6 +237,7 @@ df_votos_por_partido_presidenciales_primera_2017
 -   Dentro de "mutate()" (la nueva columna que creamos) usamos "case_when()" para asignar el nombre del partido político o coalición correspondiente a cada candidato según su primer apellido.
 
 -   Al finalizar nuestros asignamientos dentro de "case_when()", usamos " TRUE \~ "" " para asignar un valor vacío a cualquier otro caso que no coincida con los apellidos especificados.
+
 
 
 
@@ -284,7 +309,7 @@ grafico_parlamentarias_2017
 
 
 
-#### Creamos un gráfico de barras para Elecciones Parlamentarias 2017:
+#### Creamos un gráfico de barras para Elecciones Parlamentarias 2021:
 
 ```{r}
 grafico_parlamentarias_2021 <- df_votos_por_partido_parlamentarias_2021 |>
@@ -300,4 +325,22 @@ grafico_parlamentarias_2021 <- df_votos_por_partido_parlamentarias_2021 |>
   theme(text = element_text(family = "Times New Roman")) +
   coord_flip()
 grafico_parlamentarias_2021
+```
+
+#### Creamos un gráfico de barras para Elecciones Constituyentes 2021:
+
+```{r}
+grafico_constituyentes_2021 <- df_votos_por_partido_constituyentes_2021 |>
+  drop_na() |>
+  top_n(10) |>
+  ggplot(aes(x = reorder(partido, -votos), y = votos)) + 
+  scale_y_continuous(labels = scales::comma) +
+  geom_bar(stat="identity", fill = "steelblue") +
+  labs(title="Votos por Partido o Lista - Elecciones Constituyentes 2021",
+       x="Partido o Lista",
+       y="Cantidad de Votos") +
+  theme_minimal() +
+  theme(text = element_text(family = "Times New Roman")) +
+  coord_flip()
+grafico_constituyentes_2021
 ```
