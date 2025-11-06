@@ -9,13 +9,13 @@ A día de hoy, la creciente importancia del espacio digital en las dinámicas po
 
 #### Marco Teórico: Con lo anterior en mente, se utilizarán 4 papers de investigación relevantes: 
 
-  **1. Poder, Democracia y Propaganda Digital: Rol de los Partidos Políticos (2016)**
+  1. Poder, Democracia y Propaganda Digital: Rol de los Partidos Políticos (2016)
   
-  **2. Campaña digital, trabajo partidario e impacto electoral (2023)**
+  2. Campaña digital, trabajo partidario e impacto electoral (2023)
   
-  **3. Estudio de Derechos Digitales y ADS (2021)**
+  3. Estudio de Derechos Digitales y ADS (2021)
   
-  **4. Political Finance in the Digital Age in Chile (2023)**
+  4. Political Finance in the Digital Age in Chile (2023)
 
 #### Metodología: 
 El presente trabajo consistirá en un análisis exploratorio cualitativo y cuantitativo, enfocado en identificar posibles dinámicas y patrones preliminares relevantes, a través del estudio de bases de datos sobre gasto en campañas electorales y los resultados de dichas campañas. 
