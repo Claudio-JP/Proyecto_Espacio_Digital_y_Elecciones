@@ -21,14 +21,23 @@
 
 #### Bases a Utilizar:
  Servicio Electoral. (2021). Gastos Elecciones Municipales, Convencionales Constituyentes y Gobernador Regional 2021. [Data set]. 
+
  Servicio Electoral. (2021). Elección Convencionales Constituyentes 2021. [Data set].
+ 
  Servicio Electoral. (2021). Gastos Elecciones Presidencial, Parlamentarias y de Consejeros Regionales 2021. [Data set]. 
+ 
  Servicio Electoral. (2021). Elección de Senadores 2021. [Data set].
+ 
  Servicio Electoral. (2021). Elección de Diputados 2021. [Data set].
+ 
  Servicio Electoral. (2017). Gastos, Partido político, Presidenciales primera elección 2017. [Data set].
+ 
  Servicio Electoral. (2017). Presidenciales primera votación. [Data set].
+ 
  Servicio Electoral. (2018). Gastos Presidencial y Parlamentarias 2017. [Data set].
+ 
  Servicio Electoral. (2017). Elección de Senadores 2017. [Data set].
+ 
  Servicio Electoral. (2017). Elección de Diputados 2017. [Data set].
 
 ---O---
