@@ -167,11 +167,48 @@ resultados_primera_vuelta_pdte_2017 <- pp_2017 %>% group_by(primer_apellido) %>%
 rm(primera_v_presidencial_2017, pp_2017)
 ```
 
-```{r parlamentarias 2017}
-
-```
-
 ```{r **}
 rm(Gasto_Campaña_Parlamentarias_2017, Gasto_Campañas_Parlamentarias_2021, Gasto_Candidatos_Constitucionales_2021, Gasto_primera_vuelta_presidencial_2017)
+```
+
+```{r Unión de bases:output}
+
+gasto_partido_constituyentes_2021_r <- gasto_digital_constituyentes_2021 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico, region) %>%
+  summarize(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
+  ungroup()
+
+gasto_partido_constituyentes_2021 <- gasto_digital_constituyentes_2021 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico) %>%
+  summarize(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
+  ungroup()
+
+gasto_partido_parlamentarias_2021_r <- gasto_digital_parlamentarias_2021 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico, region) %>%
+  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  ungroup()
+
+gasto_partido_parlamentarias_2021 <- gasto_digital_parlamentarias_2021 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico) %>%
+  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  ungroup()
+
+gasto_partido_parlamentarias_2017_r <- gasto_digital_parlamentarias_2017 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico, region) %>%
+  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  ungroup()
+
+gasto_partido_parlamentarias_2017 <- gasto_digital_parlamentarias_2017 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico) %>%
+  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  ungroup()
+
+
 ```
 
