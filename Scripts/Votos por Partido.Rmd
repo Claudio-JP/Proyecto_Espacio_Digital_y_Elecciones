@@ -25,8 +25,10 @@ library(writexl)
 
 #### Se carga el dataset (comenzaremos con las Elecciones Diputados 2021):
 
+
+
 ```{r}
-df_diputados_2021 <- read_xlsx("[Input] Base de Datos Elecciones/2021_11_Diputados_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
+df_diputados_2021 <- read_xlsx("C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Input] Base de Datos Elecciones/2017_11_Diputados_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
   janitor::clean_names()
 ```
 
@@ -45,6 +47,7 @@ df_votos_por_partido_diputados_2021 <- df_diputados_2021 |>
   group_by(partido) |>
   summarise(votos = sum(votos, na.rm=TRUE)) |>
   arrange(desc(votos))
+write_xlsx(df_votos_por_partido_diputados_2021, path = "C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Output] Votos por Partido/votos_por_partido_diputados_2021.xlsx")
 df_votos_por_partido_diputados_2021
 ```
 
@@ -58,9 +61,12 @@ df_votos_por_partido_diputados_2021
 
 -   Usamos el código "arrange(desc(votos))" para ordenar la columna de partidos según la cantidad de votos que obtuvieron, ordenándose de mayor a menor.
 
--   Usamos el código "view(df_votos_por_partido_diputados_2021)" para visualizar el nuevo dataframe. En ella podemos observar la cantidad de votos por partido político de forma descendiente.
+- Usamos el código "write_xlsx()" para guardar el nuevo dataframe como un archivo .xlsx en el directorio escrito.
+
+-   Usamos el código "df_votos_por_partido_diputados_2021" para visualizar el nuevo dataframe. En ella podemos observar la cantidad de votos por partido político de forma descendiente.
 
     -   Podemos observar partidos, independientes y votos nulos (considerados como fila N/A en el dataframe).
+
 
 ## Sección 2: Juntar bases Diputados y Senadores 2021 (Elecciones Parlamentarias 2021)
 
@@ -73,7 +79,7 @@ Primero, reutilizaremos los códigos elaborados en la sección anterior, cambian
 #### Extraemos la base de datos de Senadores 2021:
 
 ```{r}
-df_senadores_2021 <- read_xlsx("[Input] Base de Datos Elecciones/2021_11_Senadores_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
+df_senadores_2021 <- read_xlsx("C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Input] Base de Datos Elecciones/2021_11_Senadores_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
   janitor::clean_names()
 ```
 
@@ -84,6 +90,7 @@ df_votos_por_partido_senadores_2021 <- df_senadores_2021 |>
   group_by(partido) |>
   summarise(votos = sum(votos, na.rm=TRUE)) |>
   arrange(desc(votos))
+write_xlsx(df_votos_por_partido_senadores_2021, path = "C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Output] Votos por Partido/votos_por_partido_senadores_2021.xlsx")
 df_votos_por_partido_senadores_2021
 ```
 
@@ -94,6 +101,7 @@ df_votos_por_partido_parlamentarias_2021 <- bind_rows(df_votos_por_partido_diput
   group_by(partido) |>
   summarise(votos = sum(votos, na.rm=TRUE)) |>
   arrange(desc(votos))
+write_xlsx(df_votos_por_partido_parlamentarias_2021, path = "C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Output] Votos por Partido/votos_por_partido_parlamentarias_2021.xlsx")
 df_votos_por_partido_parlamentarias_2021
 ```
 
@@ -110,7 +118,7 @@ df_votos_por_partido_parlamentarias_2021
 **Se carga el dataset:**
 
 ```{r}
-df_diputados_2017 <- read_xlsx("[Input] Base de Datos Elecciones/2017_11_Diputados_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
+df_diputados_2017 <- read_xlsx("C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Input] Base de Datos Elecciones/2017_11_Diputados_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
   janitor::clean_names()
 ```
 
@@ -121,6 +129,7 @@ df_votos_por_partido_diputados_2017 <- df_diputados_2017 |>
   group_by(partido) |>
   summarise(votos = sum(votos, na.rm=TRUE)) |>
   arrange(desc(votos))
+write_xlsx(df_votos_por_partido_diputados_2017, path = "C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Output] Votos por Partido/votos_por_partido_diputados_2017.xlsx")
 df_votos_por_partido_diputados_2017
 ```
 
@@ -129,7 +138,7 @@ df_votos_por_partido_diputados_2017
 **Se carga el dataset:**
 
 ```{r}
-df_senadores_2017 <- read_xlsx("[Input] Base de Datos Elecciones/2017_11_Senatorial_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
+df_senadores_2017 <- read_xlsx("C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Input] Base de Datos Elecciones/2017_11_Senatorial_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
   janitor::clean_names()
 ```
 
@@ -140,6 +149,7 @@ df_votos_por_partido_senadores_2017 <- df_senadores_2017 |>
   group_by(partido) |>
   summarise(votos = sum(votos, na.rm=TRUE)) |>
   arrange(desc(votos))
+write_xlsx(df_votos_por_partido_senadores_2017, path = "C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Output] Votos por Partido/votos_por_partido_senadores_2017.xlsx")
 df_votos_por_partido_senadores_2017
 ```
 
@@ -152,6 +162,7 @@ df_votos_por_partido_parlamentarias_2017 <- bind_rows(df_votos_por_partido_diput
   group_by(partido) |>
   summarise(votos = sum(votos, na.rm=TRUE)) |>
   arrange(desc(votos))
+write_xlsx(df_votos_por_partido_parlamentarias_2017, path = "C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Output] Votos por Partido/votos_por_partido_parlamentarias_2017.xlsx")
 df_votos_por_partido_parlamentarias_2017
 ```
 
@@ -162,7 +173,7 @@ El dataset de las Elecciones Presidenciales 2017 (1ra Vuelta) tiene la misma est
 #### Se carga el dataset:
 
 ```{r}
-df_presidenciales_primera_2017 <- read_xlsx("[Input] Base de Datos Elecciones/2017_11_Presidencial_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
+df_presidenciales_primera_2017 <- read_xlsx("C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Input] Base de Datos Elecciones/2017_11_Presidencial_Datos_Eleccion.xlsx", skip = 6, na=c("N/A", " ")) |>
   janitor::clean_names()
 ```
 
@@ -191,6 +202,7 @@ df_votos_por_partido_presidenciales_primera_2017 <- df_votos_por_partido_preside
     primer_apellido == "NAVARRO" ~ "PAIS",
     TRUE ~ ""
   )) 
+write_xlsx(df_votos_por_partido_presidenciales_primera_2017, path = "C:/Users/Bibliotecas uc/Downloads/Proyecto_Espacio_Digital_y_Elecciones/[Output] Votos por Partido/votos_por_partido_presidenciales_primera_2017.xlsx")
 df_votos_por_partido_presidenciales_primera_2017
 ```
 
@@ -288,55 +300,4 @@ grafico_parlamentarias_2021 <- df_votos_por_partido_parlamentarias_2021 |>
   theme(text = element_text(family = "Times New Roman")) +
   coord_flip()
 grafico_parlamentarias_2021
-```
-
-
-## Sección 6: Sacar Outputs
-
-#### Guardamos los dataframes como archivos .xlsx
-
-**Elecciones Presidenciales 2017 (1ra Vuelta):**
-
-```{r}
-write_xlsx(df_votos_por_partido_presidenciales_primera_2017, "[Output] Votos por Partido/votos_por_partido_presidenciales_primera_2017.xlsx")
-```
-
-
-**Elecciones Diputados 2017:**
-
-```{r}
-write_xlsx(df_votos_por_partido_diputados_2017, "[Output] Votos por Partido/votos_por_partido_diputados_2017.xlsx")
-```
-
-
-**Elecciones Senadores 2017:**
-
-```{r}
-write_xlsx(df_votos_por_partido_senadores_2017, "[Output] Votos por Partido/votos_por_partido_senadores_2017.xlsx")
-```
-
-
-**Elecciones Parlamentarias 2017:**
-```{r}
-write_xlsx(df_votos_por_partido_parlamentarias_2017, "[Output] Votos por Partido/votos_por_partido_parlamentarias_2017.xlsx")
-```
-
-
-**Elecciones Diputados 2021:**
-
-```{r}
-write_xlsx(df_votos_por_partido_diputados_2021, "[Output] Votos por Partido/votos_por_partido_diputados_2021.xlsx")
-```
-
-
-**Elecciones Senadores 2021:**
-
-```{r}
-write_xlsx(df_votos_por_partido_senadores_2021, "[Output] Votos por Partido/votos_por_partido_diputados_2021.xlsx")
-```
-
-
-**Elecciones Parlamentarias 2021:**
-```{r}
-write_xlsx(df_votos_por_partido_parlamentarias_2021, "[Output] Votos por Partido/votos_por_partido_parlamentarias_2021.xlsx")
 ```
