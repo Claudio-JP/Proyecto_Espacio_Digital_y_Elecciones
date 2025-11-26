@@ -201,8 +201,6 @@ df_votos_por_partido_presidenciales_primera_2017
 
 -   Al finalizar nuestros asignamientos dentro de "case_when()", usamos " TRUE \~ "" " para asignar un valor vacío a cualquier otro caso que no coincida con los apellidos especificados.
 
-
-
 ## Sección 5: Graficar
 
 #### Crearemos un gráfico de barras para visualizar los votos por partido. Comenzaremos con las Elecciones Presidenciales (1ra Vuelta) 2017:
@@ -239,12 +237,9 @@ grafico_presidenciales_primera_2017
 
 -   Usamos "coord_flip()" para voltear el gráfico, de modo que las barras sean horizontales en lugar de verticales. Esto lo hicimos con el objetivo de que el texto de los partidos o coaliciones sea más legible y no se sobrelapen uno a los otros.
 
-
-
 #### Creamos un gráfico de barras para Elecciones Parlamentarias 2017:
 
 Reutilizaremos el mismo código que las Elecciones Presidenciales 2017, modificando los nombres según sea correspondiente. Sin embargo, al haber muchos partidos políticos, el gráfico puede verse saturado, por lo tanto, visualizaremos solo los 10 partidos con mayor cantidad de votos.
-
 
 ```{r}
 grafico_parlamentarias_2017 <- df_votos_por_partido_parlamentarias_2017 |>
@@ -264,12 +259,9 @@ grafico_parlamentarias_2017
 
 **Explicación:**
 
-- Usamos  "top_n(10)" para seleccionar solo los 10 partidos con mayor cantidad de votos, facilitando la visualización del gráfico.
+-   Usamos "top_n(10)" para seleccionar solo los 10 partidos con mayor cantidad de votos, facilitando la visualización del gráfico.
 
-- Usamos "scale_y_continuous(labels = scales::comma)" para que no se muestren la cantidad de votos como anotación científica, sino como números enteros.
-
-
-
+-   Usamos "scale_y_continuous(labels = scales::comma)" para que no se muestren la cantidad de votos como anotación científica, sino como números enteros.
 
 #### Creamos un gráfico de barras para Elecciones Parlamentarias 2017:
 
@@ -288,5 +280,3 @@ grafico_parlamentarias_2021 <- df_votos_por_partido_parlamentarias_2021 |>
   coord_flip()
 grafico_parlamentarias_2021
 ```
-
-
