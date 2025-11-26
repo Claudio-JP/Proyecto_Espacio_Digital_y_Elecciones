@@ -31,7 +31,7 @@ gasto_constituyentes_2 <- gasto_constituyente_1 %>% rename(autoridad_electa = ..
 
 gasto_constituyentes_2 <- gasto_constituyentes_2 %>% filter(autoridad_electa == "CONVENCIONAL CONSTITUYENTE")
 
-gasto_digital_constituyentes_2021 <- gasto_constituyentes_2 %>% filter(str_detect(glosa_del_gasto, regex("digital", ignore_case = T)))
+gasto_digital_constituyentes_2021 <- gasto_constituyentes_2 %>% filter(str_detect(glosa_del_gasto, regex("digital",ignore_case=T)))
 
 rm(gasto_constituyente_1, gasto_constituyentes_2)
 ```
@@ -139,6 +139,222 @@ gasto_partido_presidencial_2017 <- gasto_digital_presidencial_2017 %>%
 write_xlsx(gasto_partido_constituyentes_2021, path = "gasto_partido_constituyentes_2021.xlsx")
 write_xlsx(gasto_partido_parlamentarias_2017, path = "gasto_partido_parlamentarias_2017.xlsx")
 write_xlsx(gasto_partido_parlamentarias_2021, path = "gasto_partido_parlamentarias_2021.xlsx")
-write_xlsx(gasto_partido_presidencial_2017, path = "gasto_partido_presidencial_2021.xlsx")
+write_xlsx(gasto_partido_presidencial_2017, path = "gasto_partido_presidencial_2017.xlsx")
+```
+
+```{r}
+seleccion_prueba <- gasto_partido_parlamentarias_2021 %>% filter(partido_politico %in% c("UNION DEMOCRATA INDEPENDIENTE", "PARTIDO COMUNISTA DE CHILE", "PARTIDO DE LA GENTE", "PARTIDO DEMOCRATA CRISTIANO", "PARTIDO SOCIALISTA DE CHILE", "PARTIDO REPUBLICANO DE CHILE", "RENOVACION NACIONAL"))
+
+grafico_prueba <- seleccion_prueba |>
+  drop_na() |>
+  ggplot(aes(x = partido_politico, y = gasto_digital_total)) + 
+  scale_y_continuous(labels = scales::comma) +
+  geom_bar(stat="identity", fill = "steelblue") +
+  labs(title="Gasto en Espacio Digital por Partido Parlamentarias 2021",
+       x="Partido",
+       y="Gasto Total") +
+  theme_minimal() +
+  coord_flip()
+print(grafico_prueba)
+```
+
+```{r evolución histórica del gasto}
+
+gasto_digital_1 <- gasto_digital_presidencial_2017 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico) %>%
+  summarize(gasto_total_2017_1 = sum(as.numeric(monto), na.rm = TRUE)) %>%
+  ungroup() %>% 
+  mutate(
+    partido_politico = case_when(
+      partido_politico == "PODER" ~ "COMUNES",
+      TRUE ~ partido_politico ))
+
+gasto_digital_2 <- gasto_digital_parlamentarias_2017 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico) %>%
+  summarize(gasto_total_2017_2 = sum(as.numeric(monto), na.rm = T)) %>%
+  ungroup() %>%
+  mutate(partido_politico = case_when(
+           partido_politico == "PODER" ~ "COMUNES",
+           TRUE ~ partido_politico))
+
+
+gasto_digital_3 <- gasto_digital_parlamentarias_2021 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico) %>%
+  summarize(gasto_total_2021_1 = sum(as.numeric(monto), na.rm = T)) %>%
+  ungroup() %>%
+  mutate(partido_politico = case_when(
+    partido_politico == "CIUDADANOS" ~ "PARTIDO CIUDADANOS",
+    partido_politico == "EVOLUCION POLITICA" ~ "PARTIDO EVOLUCIÓN POLITICA",
+    partido_politico == "PARTIDO PROGRESISTA DE CHILE" ~ "PARTIDO PROGRESISTA",
+    TRUE ~ partido_politico
+  ))
+
+gasto_digital_4 <- gasto_digital_constituyentes_2021 %>%
+  select(-autoridad_electa) %>%
+  group_by(partido_politico) %>%
+  summarize(gasto_total_2021_2 = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
+  ungroup() %>%
+    mutate(partido_politico = case_when(
+    partido_politico == "CIUDADANOS" ~ "PARTIDO CIUDADANOS",
+    partido_politico == "EVOLUCION POLITICA" ~ "PARTIDO EVOLUCIÓN POLITICA",
+    partido_politico == "PARTIDO PROGRESISTA DE CHILE" ~ "PARTIDO PROGRESISTA",
+    TRUE ~ partido_politico
+  ))
+
+anti_join(gasto_digital_1, gasto_digital_4)
+
+evolucion_gasto_digital <- gasto_digital_1 %>%
+  left_join(gasto_digital_2, by = "partido_politico") %>%
+  left_join(gasto_digital_3, by = "partido_politico") %>%
+  left_join(gasto_digital_4, by = "partido_politico")
+
+df_plot <- evolucion_gasto_digital %>% 
+  pivot_longer(
+    cols = starts_with("gasto_total_"),
+    names_to = "año",
+    values_to = "gasto"
+  ) %>%
+  mutate(
+    año = case_when(
+      año == "gasto_total_2017_1" ~ 1,
+      año == "gasto_total_2017_2" ~ 2,
+      año == "gasto_total_2021_1" ~ 3,
+      año == "gasto_total_2021_2" ~ 4
+    )
+  ) %>%
+  group_by(partido_politico, año) %>% 
+  summarize(gasto = sum(gasto, na.rm = TRUE), .groups = "drop")
+
+options(scipen = 999)   # evita notación científica
+
+ggplot(df_plot,
+       aes(x = año, y = gasto, group = partido_politico)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ partido_politico, scales = "free_y") +
+  theme_minimal(base_size = 14) +
+  theme(
+    strip.text = element_text(size = 4),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) +
+  labs(
+    title = "Evolución del gasto digital por partido",
+    x = "Año",
+    y = "Gasto total"
+  )
+```
+
+```{r Unión de bases existentes}
+votos_1 <- df_votos_por_partido_parlamentarias_2017
+votos_2 <- df_votos_por_partido_parlamentarias_2021
+
+anti_join(votos_1, votos_2, by = "partido")
+
+votos_1 <- votos_1 %>% 
+  mutate(partido = case_when(
+    partido == "PARTIDO RADICAL SOCIALDEMOCRATA" ~ "PARTIDO RADICAL DE CHILE",
+    partido == "INDEPENDIENTES" ~ "INDEPENDIENTE",
+    partido == "PARTIDO IGUALDAD" ~ "IGUALDAD",
+    partido == "PARTIDO RADICAL SOCIALDEMOCRATA" ~ "PARTIDO RADICAL DE CHILE",
+    partido == "PARTIDO PROGRESISTA" ~ "PARTIDO PROGRESISTA DE CHILE",
+    partido == "PODER" ~ "COMUNES",
+    TRUE ~ partido
+  ))
+
+join <- left_join(votos_1, votos_2, by = "partido")
+
+evolucion_gasto_digital <- evolucion_gasto_digital %>%
+  rename(partido = partido_politico)
+
+anti_join(join, evolucion_gasto_digital)
+anti_join(evolucion_gasto_digital, join)
+
+join <- join %>%
+  mutate(partido = case_when(
+    partido == "CIUDADANOS" ~ "PARTIDO CIUDADANOS",
+    partido == "EVOLUCION POLITICA" ~ "PARTIDO EVOLUCIÓN POLITICA",
+    partido == "PARTIDO PROGRESISTA DE CHILE" ~ "PARTIDO PROGRESISTA",
+    TRUE ~ partido
+  ))
+
+union_1 <- left_join(evolucion_gasto_digital, join, by = "partido")
+
+anti_join(union_1, votos_por_partido_constituyentes_2021)
+
+
+votos_por_partido_constituyentes_2021 <- votos_por_partido_constituyentes_2021 %>%
+  mutate(partido = case_when(
+    partido == "CIUDADANOS" ~ "PARTIDO CIUDADANOS",
+    partido == "EVOLUCION POLITICA" ~ "PARTIDO EVOLUCIÓN POLITICA",
+    partido == "INDEPENDIENTES-LISTA XJ" ~ "PARTIDO PROGRESISTA",
+    TRUE ~ partido
+  ))
+
+votos_por_partido_constituyentes_2021 <- votos_por_partido_constituyentes_2021 %>%
+  mutate(votos = case_when(
+    votos == 32364 ~ 32902,
+    TRUE ~ votos
+  ))
+  
+union_2 <- left_join(union_1, votos_por_partido_constituyentes_2021, by = "partido")
+
+union_2 <- union_2 %>% rename(
+  gasto_dig_pres_2017 = gasto_total_2017_1,
+  gasto_dig_par_2017 = gasto_total_2017_2,
+  gasto_dig_par_2021 = gasto_total_2021_1,
+  gasto_dig_conv_2021 = gasto_total_2021_2,
+  votos_par_2017 = votos.x,
+  votos_par_2021 = votos.y,
+  votos_conv_2021 = votos
+)
+```
+
+```{r Estadísticos varios}
+
+cor(union_2$gasto_dig_par_2017, union_2$votos_par_2017) #0.6525
+modelo_reg_par_2017 <- lm(union_2$votos_par_2017 ~ union_2$gasto_dig_par_2017, data = union_2)
+summary(modelo_reg_par_2017)
+
+cor(union_2$gasto_dig_par_2021, union_2$votos_par_2021) #0.8838
+modelo_reg_par_2021 <- lm(union_2$votos_par_2021 ~ union_2$gasto_dig_par_2021, data = union_2)
+summary(modelo_reg_par_2021)
+
+cor(union_2$gasto_dig_conv_2021, union_2$votos_conv_2021) #0.7534
+modelo_reg_conv_2021 <- lm(union_2$votos_conv_2021 ~ union_2$gasto_dig_conv_2021, data = union_2)
+summary(modelo_reg_conv_2021)
+
+
+union_2 <- union_2 %>%
+  mutate(
+    ideologia = case_when(
+      partido == "PARTIDO COMUNISTA DE CHILE"      ~ 1,
+      partido == "PARTIDO HUMANISTA"               ~ 1,
+      partido == "COMUNES"                         ~ 1,
+      partido == "REVOLUCION DEMOCRATICA"          ~ 2,
+      partido == "PARTIDO PROGRESISTA"             ~ 2,
+      partido == "PARTIDO LIBERAL DE CHILE"        ~ 3,
+      partido == "PARTIDO CIUDADANOS"              ~ 3,
+      partido == "PARTIDO EVOLUCIÓN POLITICA"      ~ 4,
+      partido == "PARTIDO EVOLUCION POLITICA"      ~ 4,  # por si tiene tildes o no
+      partido == "RENOVACION NACIONAL"             ~ 5,
+      partido == "UNION DEMOCRATA INDEPENDIENTE"   ~ 5,
+      TRUE                                         ~ NA_integer_
+    )
+  ) %>%
+  relocate(ideologia, .after = partido)
+
+union_2 <- union_2 %>%
+  mutate(
+    gasto_promedio = rowMeans(select(., starts_with("gasto_dig")), na.rm = TRUE)
+  ) %>%
+  relocate(gasto_promedio, .after = gasto_dig_conv_2021)
+
+#Ninguno es estadísticamente significativo al 95%, pero sí al 90%. En caso de que se considere estadísticamente significativo, la derecha efectivamente gasta más en campaña digital
+cor.test(union_2$ideologia, union_2$gasto_promedio, method = "spearman")
+cor.test(union_2$ideologia, union_2$gasto_promedio, method = "kendall")
+
 ```
 
