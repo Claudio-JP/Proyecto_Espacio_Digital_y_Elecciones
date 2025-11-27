@@ -13,6 +13,7 @@ library(janitor)
 library(tidyverse)
 library(skimr)
 library (readxl)
+library(stargazer)
 library(writexl)
 ```
 
@@ -242,7 +243,7 @@ ggplot(df_plot,
   ) +
   labs(
     title = "Evolución del gasto digital por partido",
-    x = "Año",
+    x = "Secuencia Temporal",
     y = "Gasto total"
   )
 ```
@@ -299,33 +300,46 @@ votos_por_partido_constituyentes_2021 <- votos_por_partido_constituyentes_2021 %
     TRUE ~ votos
   ))
   
-union_2 <- left_join(union_1, votos_por_partido_constituyentes_2021, by = "partido")
+union_3 <- left_join(union_1, votos_por_partido_constituyentes_2021, by = "partido")
 
-union_2 <- union_2 %>% rename(
-  gasto_dig_pres_2017 = gasto_total_2017_1,
-  gasto_dig_par_2017 = gasto_total_2017_2,
-  gasto_dig_par_2021 = gasto_total_2021_1,
-  gasto_dig_conv_2021 = gasto_total_2021_2,
-  votos_par_2017 = votos.x,
-  votos_par_2021 = votos.y,
-  votos_conv_2021 = votos
-)
+union_3 <- union_3 %>% rename( gasto_dig_pres_2017 = gasto_total_2017_1, 
+                               gasto_dig_par_2017 = gasto_total_2017_2, 
+                               gasto_dig_par_2021 = gasto_total_2021_1, 
+                               gasto_dig_conv_2021 = gasto_total_2021_2, 
+                               votos_par_2017 = votos.x, 
+                               votos_par_2021 = votos.y, 
+                               votos_conv_2021 = votos )
+
 ```
 
 ```{r Estadísticos varios}
 
-cor(union_2$gasto_dig_par_2017, union_2$votos_par_2017) #0.6525
-modelo_reg_par_2017 <- lm(union_2$votos_par_2017 ~ union_2$gasto_dig_par_2017, data = union_2)
-summary(modelo_reg_par_2017)
+tidy(cor.test(union_2$gasto_dig_par_2017, union_2$votos_par_2017)) 
+modelo_reg_par_2017 <- lm(votos_par_2017 ~ gasto_dig_par_2017, data = union_2)
+stargazer(modelo_reg_par_2017, type = "text")
 
-cor(union_2$gasto_dig_par_2021, union_2$votos_par_2021) #0.8838
+tidy(cor.test(union_2$gasto_dig_par_2021, union_2$votos_par_2021))
 modelo_reg_par_2021 <- lm(union_2$votos_par_2021 ~ union_2$gasto_dig_par_2021, data = union_2)
-summary(modelo_reg_par_2021)
+stargazer(modelo_reg_par_2021, type = "text")
 
-cor(union_2$gasto_dig_conv_2021, union_2$votos_conv_2021) #0.7534
+tidy(cor.test(union_2$gasto_dig_conv_2021, union_2$votos_conv_2021))
 modelo_reg_conv_2021 <- lm(union_2$votos_conv_2021 ~ union_2$gasto_dig_conv_2021, data = union_2)
-summary(modelo_reg_conv_2021)
+stargazer(modelo_reg_conv_2021, type = "text")
 
+union_2 <- union_2 %>%
+  mutate(
+    gasto_promedio = rowMeans(select(., starts_with("gasto_dig")), na.rm = TRUE)
+  ) %>%
+  relocate(gasto_promedio, .after = gasto_dig_conv_2021)
+
+union_2 <- union_2 %>%
+  mutate(
+    votos_promedio = rowMeans(select(., starts_with("votos")), na.rm = TRUE)
+  ) %>%
+  relocate(votos_promedio, .after = votos_conv_2021)
+
+tidy(cor.test(union_2$gasto_promedio, union_2$votos_promedio))
+stargazer(lm(votos_promedio ~ gasto_promedio, data =union_2), type = "text")
 
 union_2 <- union_2 %>%
   mutate(
@@ -337,8 +351,7 @@ union_2 <- union_2 %>%
       partido == "PARTIDO PROGRESISTA"             ~ 2,
       partido == "PARTIDO LIBERAL DE CHILE"        ~ 3,
       partido == "PARTIDO CIUDADANOS"              ~ 3,
-      partido == "PARTIDO EVOLUCIÓN POLITICA"      ~ 4,
-      partido == "PARTIDO EVOLUCION POLITICA"      ~ 4,  # por si tiene tildes o no
+      partido == "PARTIDO EVOLUCIÓN POLITICA"      ~ 4, 
       partido == "RENOVACION NACIONAL"             ~ 5,
       partido == "UNION DEMOCRATA INDEPENDIENTE"   ~ 5,
       TRUE                                         ~ NA_integer_
@@ -346,15 +359,46 @@ union_2 <- union_2 %>%
   ) %>%
   relocate(ideologia, .after = partido)
 
+
 union_2 <- union_2 %>%
   mutate(
-    gasto_promedio = rowMeans(select(., starts_with("gasto_dig")), na.rm = TRUE)
+    militantes = case_when(
+      partido == "PARTIDO CIUDADANOS"              ~ 13598,
+      partido == "PARTIDO COMUNISTA DE CHILE"      ~ 45058,
+      partido == "PARTIDO EVOLUCIÓN POLITICA"      ~ 14838,
+      partido == "PARTIDO HUMANISTA"               ~ 5414,
+      partido == "PARTIDO LIBERAL DE CHILE"        ~ 10393,
+      partido == "PARTIDO PROGRESISTA"             ~ 22959,
+      partido == "COMUNES"                         ~ 11787,
+      partido == "RENOVACION NACIONAL"             ~ 36741,
+      partido == "UNION DEMOCRATA INDEPENDIENTE"   ~ 31029,
+      partido == "REVOLUCION DEMOCRATICA"          ~ 26276,
+      TRUE                                         ~ NA_real_
+    )
   ) %>%
-  relocate(gasto_promedio, .after = gasto_dig_conv_2021)
+  relocate(militantes, .after = partido)
 
-#Ninguno es estadísticamente significativo al 95%, pero sí al 90%. En caso de que se considere estadísticamente significativo, la derecha efectivamente gasta más en campaña digital
-cor.test(union_2$ideologia, union_2$gasto_promedio, method = "spearman")
-cor.test(union_2$ideologia, union_2$gasto_promedio, method = "kendall")
+
+union_2 <- union_2 %>%
+  mutate(partido_nuevo = case_when(
+    partido %in% c("COMUNES", "REVOLUCION DEMOCRATICA", "PARTIDO LIBERAL DE CHILE", 
+                   "PARTIDO PROGRESISTA", "PARTIDO CIUDADANOS", "PARTIDO EVOLUCIÓN POLITICA") ~ 1,
+    TRUE ~ 0
+  )) %>%
+  relocate(partido_nuevo, .after = ideologia)
+
+modelo_control <- lm(votos_promedio ~ gasto_promedio + militantes + ideologia + partido_nuevo, data = union_2)
+modelo_control_1 <- lm(votos_promedio ~ gasto_promedio + ideologia, data = union_2)
+modelo_control_2 <- lm(votos_promedio ~ gasto_promedio + militantes, data = union_2)
+modelo_control_3 <- lm(votos_promedio ~ gasto_promedio + partido_nuevo, data = union_2)
+
+
+stargazer(modelo_control, type = "text")
+stargazer(modelo_control_3, type = "text")
+
+modelo_prueba <- lm(gasto_promedio ~ ideologia, data = union_2)
+stargazer(modelo_prueba, type = "text")
+
 
 ```
 
