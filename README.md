@@ -142,9 +142,9 @@ Por unidad principal de análisis se tendrán a 10 partidos políticos transvers
 ## Plan de Análisis
 Con los outputs iniciales de Gastos y Resultados electorales, el objetivo ahora es comenzar con la identificación inicial de las relaciones entre las variables dependiente e independiente.
 
-Esto, mediante la aplicación de herramientas estadísticas varias como el cálculo de correlación, regresiones logística multinomial, regresión lineal múltiple, análisis de efectos marginales, entre otras consideraciones según el avance de los estudios.
+Esto, mediante la aplicación de herramientas estadísticas varias como el cálculo estadísticos como la correlación, regresiones logística simple y múltiple.
 
-Además, se controlará por concepto de variable interviniente a: Región, Tipo de Elección, Evolución Temporal. Según el avance del análisis, se podrán considerar otras variables intervinientes.
+Además, se controlará por concepto de variable interviniente a:antigüedad del partido, tamaño según militancia, y orientación ideológica del partido.
 <br>
 <br>
 
