@@ -2,6 +2,8 @@
 title: "Análisis inicial de bases"
 output: html_document
 date: "2025-10-06"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -12,128 +14,239 @@ knitr::opts_chunk$set(echo = TRUE)
 library(janitor)
 library(tidyverse)
 library(skimr)
-library (readxl)
+library(readxl)
 library(stargazer)
 library(writexl)
 ```
 
-La importación de las bases se realizó con la función automática "import dataset..."
+# Constitucionales 2021
+
+```{r}
+Gasto_Candidatos_Constitucionales_2021 <- read_xlsx("[Input] Bases de Datos Gastos/Gasto Candidatos Constitucionales 2021.xlsx", skip = 5)
+
+head(Gasto_Candidatos_Constitucionales_2021)
+```
+
 
 ```{r Convencionales 2021}
+
 colnames(Gasto_Candidatos_Constitucionales_2021)
 
-gasto_constituyente_1 <- Gasto_Candidatos_Constitucionales_2021 %>% select(...2, ...3, ...9, ...19, ...20)
+gasto_constituyente_1 <- Gasto_Candidatos_Constitucionales_2021 |> 
+   select(2, 3, 9, 19, 20)
 
-gasto_constituyentes_2 <- gasto_constituyente_1 %>% rename(autoridad_electa = ...2,
-                      region = ...3,
-                      partido_politico = ...9,
-                      glosa_del_gasto = ...19,
-                      monto_en_pesos = ...20)
+gasto_constituyentes_2 <- gasto_constituyente_1 %>%
+  rename(
+    autoridad_electa = 1,
+    region = 2,
+    partido_politico = 3,
+    glosa_del_gasto = 4,
+    monto_en_pesos = 5
+  )
 
-gasto_constituyentes_2 <- gasto_constituyentes_2 %>% filter(autoridad_electa == "CONVENCIONAL CONSTITUYENTE")
+gasto_constituyentes_2 <- gasto_constituyentes_2 |> 
+  filter(autoridad_electa == "CONVENCIONAL CONSTITUYENTE")
 
-gasto_digital_constituyentes_2021 <- gasto_constituyentes_2 %>% filter(str_detect(glosa_del_gasto, regex("digital",ignore_case=T)))
+gasto_digital_constituyentes_2021 <- gasto_constituyentes_2 |> 
+  mutate(glosa_del_gasto = str_to_lower(glosa_del_gasto)) |> 
+  mutate(glosa_contiene_digital = str_detect(glosa_del_gasto, 
+                                             "digital|online|google|youtube|web|facebook|twitter|redes sociales"))
+
+# Conteo de glosa que contiene la palabra digital
+
+gasto_digital_constituyentes_2021 |> 
+  count(glosa_contiene_digital)
 
 rm(gasto_constituyente_1, gasto_constituyentes_2)
 ```
 
+
+# Parlamentarias 2021
+
+```{r}
+Gasto_Campañas_Parlamentarias_2021 <- read_xlsx("[Input] Bases de Datos Gastos/Gasto Campañas Parlamentarias 2021.xlsx", skip = 5)
+
+head(Gasto_Campañas_Parlamentarias_2021)
+```
+
+
 ```{r Parlamentarias 2021}
 colnames(Gasto_Campañas_Parlamentarias_2021)
 
-gasto_parlamentarias_1 <- Gasto_Campañas_Parlamentarias_2021 %>% select(...2,...3,...9,...19,...21)
+gasto_parlamentarias_1 <- Gasto_Campañas_Parlamentarias_2021 %>% 
+   select(2, 3, 9, 19, 21)
 
-gasto_parlamentarias_2 <- gasto_parlamentarias_1 %>% rename(autoridad_electa = ...2,
-                      region = ...3,
-                      partido_politico = ...9,
-                      glosa_del_gasto = ...19,
-                      monto = ...21)
+gasto_parlamentarias_2 <- gasto_parlamentarias_1 %>% 
+  rename(
+    autoridad_electa = 1,
+    region = 2,
+    partido_politico = 3,
+    glosa_del_gasto = 4,
+    monto_en_pesos = 5
+  )
 
-gasto_digital_parlamentarias_2021 <- gasto_parlamentarias_2 %>% filter(str_detect(glosa_del_gasto, regex("digital", ignore_case = T)),
-                               autoridad_electa %in% c("SENADOR", "DIPUTADO"))
+gasto_parlamentarias_2 |> 
+  count(autoridad_electa)
+
+gasto_digital_parlamentarias_2021 <- gasto_parlamentarias_2 %>% 
+  filter(autoridad_electa %in% c("SENADOR", "DIPUTADO")) |> 
+  mutate(glosa_del_gasto = str_to_lower(glosa_del_gasto),
+         glosa_contiene_digital = str_detect(glosa_del_gasto, 
+                                             "digital|online|google|youtube|web|facebook|twitter|redes sociales"))
+
+gasto_digital_parlamentarias_2021 |> 
+  count(glosa_contiene_digital)
 
 rm(gasto_parlamentarias_1, gasto_parlamentarias_2)
+```
+
+# Parlamentarias 2017
+
+```{r}
+Gasto_Campaña_Parlamentarias_2017 <- read_xlsx("[Input] Bases de Datos Gastos/Gasto Campaña Parlamentarias 2017.xlsx", skip = 4)
 ```
 
 ```{r Parlamentarias 2017}
 colnames(Gasto_Campaña_Parlamentarias_2017)
 
-gasto_parlamentarias_1 <- Gasto_Campaña_Parlamentarias_2017 %>% select("PLANILLA DE GASTOS ELECCIONES PRESIDENCIAL Y PARLAMENTARIAS", ...2, ...8,...18, ...19)
+gasto_parlamentarias_1 <- Gasto_Campaña_Parlamentarias_2017 %>% 
+  select(1, 2, 8,18, 19)
 
-gasto_parlamentarias_2 <- gasto_parlamentarias_1 %>% rename(autoridad_electa = "PLANILLA DE GASTOS ELECCIONES PRESIDENCIAL Y PARLAMENTARIAS",
-                          region = ...2,
-                          partido_politico = ...8,
-                          glosa_del_gasto = ...18,
-                          monto = ...19)
+gasto_parlamentarias_2 <- gasto_parlamentarias_1 %>% rename(
+  autoridad_electa = 1,
+  region = 2,
+  partido_politico = 3,
+  glosa_del_gasto = 4,
+  monto_en_pesos = 5
+)
 
-gasto_digital_parlamentarias_2017 <- gasto_parlamentarias_2 %>% filter(str_detect(glosa_del_gasto, regex("digital",ignore_case=T)),
-                                   autoridad_electa %in% c("SENADOR", "DIPUTADO"))
+gasto_parlamentarias_2 |> 
+  count(autoridad_electa)
+
+gasto_digital_parlamentarias_2017 <- gasto_parlamentarias_2 %>% 
+  filter(autoridad_electa %in% c("SENADOR", "DIPUTADO")) |> 
+  mutate(glosa_del_gasto = str_to_lower(glosa_del_gasto),
+         glosa_contiene_digital = str_detect(glosa_del_gasto, 
+                                             "digital|online|google|youtube|web|facebook|twitter|redes sociales"))
+
+gasto_digital_parlamentarias_2017 |> 
+  count(glosa_contiene_digital)
+
+gasto_digital_parlamentarias_2017 <- gasto_digital_parlamentarias_2017 |> 
+  filter(!is.na(glosa_contiene_digital))
+
 rm(gasto_parlamentarias_1, gasto_parlamentarias_2)
 ```
 
+# Primera vuelta presidencial 2017
+
+```{r}
+Gasto_primera_vuelta_presidencial_2017 <- read_xlsx("[Input] Bases de Datos Gastos/Gasto primera vuelta presidencial 2017.xlsx", skip = 3)
+```
+
+
 ```{r 1a Presidenciales 2017}
 colnames(Gasto_primera_vuelta_presidencial_2017)
-gasto_presidencial_2017 <- Gasto_primera_vuelta_presidencial_2017 %>% select(...4, ...2, ...3, ...14, ...15)
 
-gasto_presidencial_2017_1 <- gasto_presidencial_2017 %>% rename(autoridad_electa = ...4,
-                            region = ...2,
-                            partido_politico = ...3,
-                            glosa_del_gasto = ...14,
-                            monto = ...15)
+gasto_presidencial_2017 <- Gasto_primera_vuelta_presidencial_2017 %>% 
+  select(4, 2, 3, 14, 15)
 
-gasto_presidencial_2017_1 <- gasto_presidencial_2017_1 %>% select(-region)
+gasto_presidencial_2017_1 <- gasto_presidencial_2017 %>%
+  rename(
+    autoridad_electa = 1,
+    region = 2,
+    partido_politico = 3,
+    glosa_del_gasto = 4,
+    monto_en_pesos = 5
+  )
 
-gasto_digital_presidencial_2017 <- gasto_presidencial_2017_1 %>% filter(str_detect(glosa_del_gasto, regex("digital",ignore_case=T)))
+gasto_presidencial_2017_1 <- gasto_presidencial_2017_1 %>% 
+  select(-region)
+
+gasto_digital_presidencial_2017 <- gasto_presidencial_2017_1 %>%
+  mutate(
+    glosa_del_gasto = str_to_lower(glosa_del_gasto),
+    glosa_contiene_digital = str_detect(
+      glosa_del_gasto,
+      "digital|online|google|youtube|web|facebook|twitter|redes sociales"
+    )
+  )
+
+gasto_digital_presidencial_2017 |> 
+  count(glosa_contiene_digital)
+
+gasto_digital_presidencial_2017 <- gasto_digital_presidencial_2017 |> 
+  filter(!is.na(glosa_contiene_digital))
 
 rm(gasto_presidencial_2017, gasto_presidencial_2017_1)
 ```
+
+Eliminamos las bases de datos que no estamos utilizando:
 
 ```{r **}
 rm(Gasto_Campaña_Parlamentarias_2017, Gasto_Campañas_Parlamentarias_2021, Gasto_Candidatos_Constitucionales_2021, Gasto_primera_vuelta_presidencial_2017)
 ```
 
-```{r Unión de bases:output}
+# Unión de bases de datos
 
+## Constituyentes
+
+```{r}
 gasto_partido_constituyentes_2021_r <- gasto_digital_constituyentes_2021 %>%
   select(-autoridad_electa) %>%
-  group_by(partido_politico, region) %>%
-  summarize(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
+  group_by(partido_politico, region, glosa_contiene_digital) %>%
+  summarise(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup()
 
 gasto_partido_constituyentes_2021 <- gasto_digital_constituyentes_2021 %>%
   select(-autoridad_electa) %>%
-  group_by(partido_politico) %>%
-  summarize(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
+  group_by(partido_politico, glosa_contiene_digital) %>%
+  summarise(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup()
+```
 
+## Parlamentarias 2021
+
+```{r}
 gasto_partido_parlamentarias_2021_r <- gasto_digital_parlamentarias_2021 %>%
   select(-autoridad_electa) %>%
-  group_by(partido_politico, region) %>%
-  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  group_by(partido_politico, region, glosa_contiene_digital) %>%
+  summarise(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup()
 
 gasto_partido_parlamentarias_2021 <- gasto_digital_parlamentarias_2021 %>%
   select(-autoridad_electa) %>%
-  group_by(partido_politico) %>%
-  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  group_by(partido_politico, glosa_contiene_digital) %>%
+  summarise(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup()
+```
 
+## Parlamentarias 2017
+
+```{r}
 gasto_partido_parlamentarias_2017_r <- gasto_digital_parlamentarias_2017 %>%
   select(-autoridad_electa) %>%
-  group_by(partido_politico, region) %>%
-  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  group_by(partido_politico, region, glosa_contiene_digital) %>%
+  summarise(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup()
 
 gasto_partido_parlamentarias_2017 <- gasto_digital_parlamentarias_2017 %>%
   select(-autoridad_electa) %>%
-  group_by(partido_politico) %>%
-  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  group_by(partido_politico, glosa_contiene_digital) %>%
+  summarise(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup()
+```
+
+## Presidenciales 2017
+
+```{r Unión de bases:output}
 
 gasto_partido_presidencial_2017 <- gasto_digital_presidencial_2017 %>%
   select(-autoridad_electa) %>%
-  group_by(partido_politico) %>%
-  summarize(gasto_digital_total = sum(as.numeric(monto), na.rm = T)) %>%
+  group_by(partido_politico, glosa_contiene_digital) %>%
+  summarise(gasto_digital_total = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup()
+
 ```
 
 ```{r}
@@ -143,28 +256,48 @@ write_xlsx(gasto_partido_parlamentarias_2021, path = "gasto_partido_parlamentari
 write_xlsx(gasto_partido_presidencial_2017, path = "gasto_partido_presidencial_2017.xlsx")
 ```
 
+# Selección de partidos
+
 ```{r}
-seleccion_prueba <- gasto_partido_parlamentarias_2021 %>% filter(partido_politico %in% c("UNION DEMOCRATA INDEPENDIENTE", "PARTIDO COMUNISTA DE CHILE", "PARTIDO DE LA GENTE", "PARTIDO DEMOCRATA CRISTIANO", "PARTIDO SOCIALISTA DE CHILE", "PARTIDO REPUBLICANO DE CHILE", "RENOVACION NACIONAL"))
+seleccion_prueba <- gasto_partido_parlamentarias_2021 %>%
+  filter(
+    partido_politico %in% c(
+      "UNION DEMOCRATA INDEPENDIENTE",
+      "PARTIDO COMUNISTA DE CHILE",
+      "PARTIDO DE LA GENTE",
+      "PARTIDO DEMOCRATA CRISTIANO",
+      "PARTIDO SOCIALISTA DE CHILE",
+      "PARTIDO REPUBLICANO DE CHILE",
+      "RENOVACION NACIONAL"
+    )
+  )
 
 grafico_prueba <- seleccion_prueba |>
-  drop_na() |>
+  filter(glosa_contiene_digital) |> 
+  mutate(gasto_digital_total_m = scales::label_number(scale = 1e-6, suffix = "M")(gasto_digital_total)) |> 
   ggplot(aes(x = partido_politico, y = gasto_digital_total)) + 
-  scale_y_continuous(labels = scales::comma) +
-  geom_bar(stat="identity", fill = "steelblue") +
+  geom_bar(stat="identity", fill = "steelblue", width = 0.8) +
+  geom_text(aes(label = gasto_digital_total_m),
+            hjust = 1.2, color = "white") +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-6, suffix = "M")) +
   labs(title="Gasto en Espacio Digital por Partido Parlamentarias 2021",
        x="Partido",
        y="Gasto Total") +
   theme_minimal() +
   coord_flip()
-print(grafico_prueba)
+
+grafico_prueba
 ```
+
+# Evolución histórica del gasto
 
 ```{r evolución histórica del gasto}
 
 gasto_digital_1 <- gasto_digital_presidencial_2017 %>%
-  select(-autoridad_electa) %>%
+  select(-autoridad_electa) |> 
+  filter(glosa_contiene_digital) |> 
   group_by(partido_politico) %>%
-  summarize(gasto_total_2017_1 = sum(as.numeric(monto), na.rm = TRUE)) %>%
+  summarise(gasto_total_2017_1 = sum(as.numeric(monto_en_pesos), na.rm = TRUE)) %>%
   ungroup() %>% 
   mutate(
     partido_politico = case_when(
@@ -173,8 +306,9 @@ gasto_digital_1 <- gasto_digital_presidencial_2017 %>%
 
 gasto_digital_2 <- gasto_digital_parlamentarias_2017 %>%
   select(-autoridad_electa) %>%
+  filter(glosa_contiene_digital) |> 
   group_by(partido_politico) %>%
-  summarize(gasto_total_2017_2 = sum(as.numeric(monto), na.rm = T)) %>%
+  summarise(gasto_total_2017_2 = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup() %>%
   mutate(partido_politico = case_when(
            partido_politico == "PODER" ~ "COMUNES",
@@ -183,8 +317,9 @@ gasto_digital_2 <- gasto_digital_parlamentarias_2017 %>%
 
 gasto_digital_3 <- gasto_digital_parlamentarias_2021 %>%
   select(-autoridad_electa) %>%
+  filter(glosa_contiene_digital) |> 
   group_by(partido_politico) %>%
-  summarize(gasto_total_2021_1 = sum(as.numeric(monto), na.rm = T)) %>%
+  summarise(gasto_total_2021_1 = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup() %>%
   mutate(partido_politico = case_when(
     partido_politico == "CIUDADANOS" ~ "PARTIDO CIUDADANOS",
@@ -195,6 +330,7 @@ gasto_digital_3 <- gasto_digital_parlamentarias_2021 %>%
 
 gasto_digital_4 <- gasto_digital_constituyentes_2021 %>%
   select(-autoridad_electa) %>%
+  filter(glosa_contiene_digital) |> 
   group_by(partido_politico) %>%
   summarize(gasto_total_2021_2 = sum(as.numeric(monto_en_pesos), na.rm = T)) %>%
   ungroup() %>%
@@ -227,7 +363,7 @@ df_plot <- evolucion_gasto_digital %>%
     )
   ) %>%
   group_by(partido_politico, año) %>% 
-  summarize(gasto = sum(gasto, na.rm = TRUE), .groups = "drop")
+  summarise(gasto = sum(gasto, na.rm = TRUE), .groups = "drop")
 
 options(scipen = 999)   # evita notación científica
 
@@ -235,18 +371,86 @@ ggplot(df_plot,
        aes(x = año, y = gasto, group = partido_politico)) +
   geom_line() +
   geom_point() +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-6, suffix = "M")) +
   facet_wrap(~ partido_politico, scales = "free_y") +
-  theme_minimal(base_size = 14) +
-  theme(
-    strip.text = element_text(size = 4),
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  ) +
-  labs(
+    labs(
     title = "Evolución del gasto digital por partido",
     x = "Secuencia Temporal",
     y = "Gasto total"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    strip.text = element_text(size = 6),
+    axis.text = element_text(size = 8)
   )
+
+df_plot |> 
+  select(partido_politico) |> 
+  unique()
+
+df_plot_partido <- df_plot |>
+  mutate(
+    partido_recortado = case_match(
+      partido_politico,
+      "COMUNES"                    ~ "COMUNES",
+      "PARTIDO CIUDADANOS"         ~ "CIUDADANOS",
+      "PARTIDO COMUNISTA DE CHILE" ~ "PC",
+      "PARTIDO ECOLOGISTA VERDE"   ~ "ECOLOGISTA VERDE",
+      "PARTIDO EVOLUCIÓN POLITICA" ~ "EVOPOLI",
+      "PARTIDO HUMANISTA"          ~ "HUMANISTA",
+      "PARTIDO LIBERAL DE CHILE"   ~ "LIBERAL",
+      "PARTIDO POR LA DEMOCRACIA"  ~ "PPD",
+      "PARTIDO PROGRESISTA"        ~ "PRO",
+      "RENOVACION NACIONAL"        ~ "RN",
+      "REVOLUCION DEMOCRATICA"     ~ "RD",
+      "UNION DEMOCRATA INDEPENDIENTE" ~ "UDI",
+      .default = partido_politico
+    )
+  )
+
+colores_partidos <- c(
+  "COMUNES"                 = "#E41A1C",  # rojo
+  "CIUDADANOS"              = "#FDB462",  # naranjo (centro)
+  "PC"                      = "#A50F15",  # rojo oscuro
+  "ECOLOGISTA VERDE"        = "#4DAF4A",  # verde
+  "EVOPOLI"                 = "#377EB8",  # azul (derecha liberal)
+  "HUMANISTA"               = "#984EA3",  # morado
+  "LIBERAL"                 = "#FF7F00",  # naranjo
+  "PPD"                     = "#FB6A4A",  # centro-izq rojo suave
+  "PRO"                     = "#CB181D",  # rojo
+  "RN"                      = "#08519C",  # azul
+  "RD"                      = "#F768A1",  # rosado (izq)
+  "UDI"                     = "#2171B5"   # azul
+)
+
+ggplot(df_plot_partido,
+       aes(x = año, y = gasto, group = partido_recortado, color = partido_recortado)) +
+  geom_line(show.legend = FALSE) +
+  geom_point() +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-6, suffix = "M")) +
+  scale_color_manual(values = colores_partidos) +
+  guides(color = guide_legend(nrow = 2)) +
+  #facet_wrap(~ partido_politico, scales = "free_y") +
+    labs(
+    title = "Evolución del gasto digital por partido",
+    x = "Secuencia temporal de elecciones",
+    y = "Gasto total (Millones)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    #strip.text = element_text(size = 6),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 9),
+    legend.position = "bottom",
+    legend.justification = 0, # Modificar donde empieza la leyenda
+    legend.title = element_blank()
+  )
+
 ```
+
+
+
 
 ```{r Unión de bases existentes}
 votos_1 <- df_votos_por_partido_parlamentarias_2017
@@ -283,8 +487,9 @@ join <- join %>%
 
 union_1 <- left_join(evolucion_gasto_digital, join, by = "partido")
 
-anti_join(union_1, votos_por_partido_constituyentes_2021)
+votos_por_partido_constituyentes_2021 <- df_votos_por_partido_constituyentes_2021
 
+anti_join(union_1, votos_por_partido_constituyentes_2021)
 
 votos_por_partido_constituyentes_2021 <- votos_por_partido_constituyentes_2021 %>%
   mutate(partido = case_when(
@@ -300,9 +505,10 @@ votos_por_partido_constituyentes_2021 <- votos_por_partido_constituyentes_2021 %
     TRUE ~ votos
   ))
   
-union_3 <- left_join(union_1, votos_por_partido_constituyentes_2021, by = "partido")
 
-union_3 <- union_3 %>% rename( gasto_dig_pres_2017 = gasto_total_2017_1, 
+union_2 <- left_join(union_1, votos_por_partido_constituyentes_2021, by = "partido")
+
+union_2 <- union_2 %>% rename( gasto_dig_pres_2017 = gasto_total_2017_1, 
                                gasto_dig_par_2017 = gasto_total_2017_2, 
                                gasto_dig_par_2021 = gasto_total_2021_1, 
                                gasto_dig_conv_2021 = gasto_total_2021_2, 
@@ -312,19 +518,26 @@ union_3 <- union_3 %>% rename( gasto_dig_pres_2017 = gasto_total_2017_1,
 
 ```
 
-```{r Estadísticos varios}
+# Análisis estadístico I
 
-tidy(cor.test(union_2$gasto_dig_par_2017, union_2$votos_par_2017)) 
+## Correlaciones
+
+```{r}
+cor.test(union_2$gasto_dig_par_2017, union_2$votos_par_2017)
 modelo_reg_par_2017 <- lm(votos_par_2017 ~ gasto_dig_par_2017, data = union_2)
 stargazer(modelo_reg_par_2017, type = "text")
 
-tidy(cor.test(union_2$gasto_dig_par_2021, union_2$votos_par_2021))
+cor.test(union_2$gasto_dig_par_2021, union_2$votos_par_2021)
 modelo_reg_par_2021 <- lm(union_2$votos_par_2021 ~ union_2$gasto_dig_par_2021, data = union_2)
 stargazer(modelo_reg_par_2021, type = "text")
 
-tidy(cor.test(union_2$gasto_dig_conv_2021, union_2$votos_conv_2021))
+cor.test(union_2$gasto_dig_conv_2021, union_2$votos_conv_2021)
 modelo_reg_conv_2021 <- lm(union_2$votos_conv_2021 ~ union_2$gasto_dig_conv_2021, data = union_2)
 stargazer(modelo_reg_conv_2021, type = "text")
+```
+
+
+```{r Estadísticos varios}
 
 union_2 <- union_2 %>%
   mutate(
@@ -338,7 +551,7 @@ union_2 <- union_2 %>%
   ) %>%
   relocate(votos_promedio, .after = votos_conv_2021)
 
-tidy(cor.test(union_2$gasto_promedio, union_2$votos_promedio))
+cor.test(union_2$gasto_promedio, union_2$votos_promedio)
 stargazer(lm(votos_promedio ~ gasto_promedio, data =union_2), type = "text")
 
 union_2 <- union_2 %>%
@@ -387,6 +600,11 @@ union_2 <- union_2 %>%
   )) %>%
   relocate(partido_nuevo, .after = ideologia)
 
+```
+
+# Modelos econométricos
+
+```{r}
 modelo_control <- lm(votos_promedio ~ gasto_promedio + militantes + ideologia + partido_nuevo, data = union_2)
 modelo_control_1 <- lm(votos_promedio ~ gasto_promedio + ideologia, data = union_2)
 modelo_control_2 <- lm(votos_promedio ~ gasto_promedio + militantes, data = union_2)
@@ -398,7 +616,164 @@ stargazer(modelo_control_3, type = "text")
 
 modelo_prueba <- lm(gasto_promedio ~ ideologia, data = union_2)
 stargazer(modelo_prueba, type = "text")
+```
 
 
+
+
+# De base wider a longer
+
+```{r}
+df_plot_partido <- df_plot_partido |> 
+    mutate(
+    ideologia = case_when(
+      partido_politico == "PARTIDO COMUNISTA DE CHILE"      ~ 1,
+      partido_politico == "PARTIDO HUMANISTA"               ~ 1,
+      partido_politico == "COMUNES"                         ~ 1,
+      partido_politico == "REVOLUCION DEMOCRATICA"          ~ 2,
+      partido_politico == "PARTIDO PROGRESISTA"             ~ 2,
+      partido_politico == "PARTIDO POR LA DEMOCRACIA"       ~ 2,
+      partido_politico == "PARTIDO LIBERAL DE CHILE"        ~ 3,
+      partido_politico == "PARTIDO CIUDADANOS"              ~ 3,
+      partido_politico == "PARTIDO EVOLUCIÓN POLITICA"      ~ 4,
+      partido_politico == "PARTIDO ECOLOGISTA VERDE"        ~ 4,
+      partido_politico == "RENOVACION NACIONAL"             ~ 5,
+      partido_politico == "UNION DEMOCRATA INDEPENDIENTE"   ~ 5,
+      TRUE                                         ~ NA_integer_
+    )
+  )
+
+# parlamentaria 2017
+votos_1 <- votos_1 |> 
+  mutate(año = 1)
+# parlamentaria 2021
+votos_2 <- votos_2 |> 
+  mutate(año = 2)
+# convencional 2021
+votos_3 <- votos_por_partido_constituyentes_2021 |> 
+  mutate(año = 4)
+# primarias presidenciales
+
+votos <- bind_rows(votos_1,
+                   votos_2,
+                   votos_3)
+
+votos_partido <- votos %>%
+  mutate(
+    militantes = case_when(
+      partido == "PARTIDO CIUDADANOS"              ~ 13598,
+      partido == "PARTIDO COMUNISTA DE CHILE"      ~ 45058,
+      partido == "PARTIDO EVOLUCIÓN POLITICA"      ~ 14838,
+      partido == "PARTIDO HUMANISTA"               ~ 5414,
+      partido == "PARTIDO LIBERAL DE CHILE"        ~ 10393,
+      partido == "PARTIDO PROGRESISTA"             ~ 22959,
+      partido == "COMUNES"                         ~ 11787,
+      partido == "RENOVACION NACIONAL"             ~ 36741,
+      partido == "UNION DEMOCRATA INDEPENDIENTE"   ~ 31029,
+      partido == "REVOLUCION DEMOCRATICA"          ~ 26276,
+      TRUE                                         ~ NA_real_
+    )
+  ) %>%
+  relocate(militantes, .after = partido)
+
+
+votos_partido <- votos_partido %>%
+  mutate(partido_nuevo = case_when(
+    partido %in% c("COMUNES", "REVOLUCION DEMOCRATICA", "PARTIDO LIBERAL DE CHILE", 
+                   "PARTIDO PROGRESISTA", "PARTIDO CIUDADANOS", "PARTIDO EVOLUCIÓN POLITICA") ~ 1,
+    TRUE ~ 0
+  )) %>%
+  relocate(partido_nuevo)
+
+votos_partido <- votos_partido |>
+  mutate(
+    partido_recortado = case_match(
+      partido,
+      "COMUNES"                    ~ "COMUNES",
+      "PARTIDO CIUDADANOS"         ~ "CIUDADANOS",
+      "PARTIDO COMUNISTA DE CHILE" ~ "PC",
+      "PARTIDO ECOLOGISTA VERDE"   ~ "ECOLOGISTA VERDE",
+      "PARTIDO EVOLUCIÓN POLITICA" ~ "EVOPOLI",
+      "PARTIDO HUMANISTA"          ~ "HUMANISTA",
+      "PARTIDO LIBERAL DE CHILE"   ~ "LIBERAL",
+      "PARTIDO POR LA DEMOCRACIA"  ~ "PPD",
+      "PARTIDO PROGRESISTA"        ~ "PRO",
+      "RENOVACION NACIONAL"        ~ "RN",
+      "REVOLUCION DEMOCRATICA"     ~ "RD",
+      "UNION DEMOCRATA INDEPENDIENTE" ~ "UDI",
+      .default = partido
+    )
+  )
+
+votos_partido <- votos_partido |> 
+  filter(!str_detect(partido_recortado, "INDEPENDIENTE") & 
+           !is.na(partido_recortado) & 
+           partido_recortado != "") 
+
+votos_partido <- votos_partido |> 
+  select(-partido)
+
+df_completa <- df_plot_partido |> 
+  left_join(votos_partido)
+
+df_completa <- df_completa |> 
+  group_by(partido_politico) |> 
+  fill(partido_nuevo, ideologia, .direction = "downup") # Completar para las observaciones que no están
+
+```
+
+Histograma de los datos de interés
+
+```{r}
+df_completa |> 
+  ggplot(aes(x = año, y = log(gasto))) + # transformar variable para escalar
+  geom_col() +
+  facet_grid(cols = vars(partido_politico))
+
+df_completa |> 
+  ggplot(aes(x = año, y = log(votos))) +
+  geom_col() +
+  facet_grid(cols = vars(partido_politico))
+```
+
+Transformacion de variables
+
+```{r}
+df_completa <- df_completa |> 
+  mutate(gasto_log = log(gasto)) |> 
+  group_by(año) |> 
+  mutate(porc_votos = votos / sum(votos, na.rm = T))
+```
+
+```{r}
+df_completa |> 
+  ggplot(aes(x = año, y = porc_votos)) + # transformar variable para escalar
+  geom_col() +
+  facet_grid(cols = vars(partido_politico))
+
+df_completa |> 
+  ggplot(aes(x = año, y = votos_log)) + # transformar variable para escalar
+  geom_col() +
+  facet_grid(cols = vars(partido_politico))
+```
+
+
+# Modelos 
+
+```{r}
+colnames(df_completa)
+
+modelo_1 <- lm(porc_votos ~ gasto_log + ideologia + factor(año),
+               data = df_completa)
+
+modelo_2 <- lm(porc_votos ~ gasto_log + ideologia + partido_nuevo + factor(año),
+               data = df_completa)
+
+modelo_3 <- lm(porc_votos ~ gasto_log + factor(año),
+               data = df_completa)
+
+modelos <- list(modelo_1, modelo_2, modelo_3)
+
+stargazer(modelos, type = "text")
 ```
 
